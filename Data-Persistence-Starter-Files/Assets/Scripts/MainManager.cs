@@ -72,6 +72,8 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        ScanePersistantData.Instance.actualScore = m_Points;
+        ScanePersistantData.Instance.SaveAll();
     }
 
 }
