@@ -32,27 +32,7 @@ public class ScanePersistantData : MonoBehaviour
         public string[] names = new string[10];
         public int[] scores = new int[10];
     }
-    void SortingArray (int [] numbers, string[] names)
-    {
-        var auxNumbers=new int[numbers.Length]; 
-        var auxNames=new string[names.Length];
-
-        for (int i = 0; i < numbers.Length; i++)
-        {
-            auxNumbers[i]=numbers[i];
-            auxNames[i]=names[i];
-        }
-
-        for (int i = 0; i < numbers.Length; i++)
-        {
-            for(int j = 0; j < numbers.Length; j++)
-            {
-                //en cada vuelta compara la posicion i del array principal de numeros con la posicion j del auxiliar,
-                //en caso de ser mayor guarda en esa posicion ese valor y en su equivalente el valor del nombre.
-                //Esto se repite hasta recorrer por completo todas las posiciones de i
-            }
-        }
-    }
+    
     public void SaveAll()
     {
         SaveData data = new SaveData();
@@ -75,7 +55,6 @@ public class ScanePersistantData : MonoBehaviour
             {
                 finished = true;
             }
-            //compare score here in order to save the best scores
         }
 
         if (!nameSaved && index < 10) 
@@ -85,9 +64,14 @@ public class ScanePersistantData : MonoBehaviour
             nameSaved = true; 
         }
 
-
+        SortArrays(actualScore, actualName.text);
+        //data.scores in a for = scores and the same with names
+        for (int i = 0; i < scores.Length; i++)
+        {
+            data.scores[i]= scores[i];
+            data.names[i] = names[i];
+        }
         string json = JsonUtility.ToJson(data);
-
         File.WriteAllText(Application.persistentDataPath + "/savefileBrick.json", json);
     }
 
@@ -109,5 +93,43 @@ public class ScanePersistantData : MonoBehaviour
             }
                         
         }
+    }
+    void SortArrays(int score, string name)
+    {
+        var auxNumbers = new int[scores.Length+1];
+        var auxNames = new string[names.Length+1];
+        var highScore = 0;
+        var highScoreIndex = 0;
+        
+
+        for (int i = 0; i < scores.Length; i++)
+        {
+            auxNumbers[i] = scores[i];
+            auxNames[i] = names[i];
+        }
+        auxNumbers[auxNumbers.Length-1] = score;
+        auxNames[auxNames.Length - 1] = name;
+
+        for (int i = 0;i < scores.Length; i++)
+        {
+            for (int j = 0; j < auxNumbers.Length; j++)
+            {
+                if (auxNumbers[j] > highScore)
+                {
+                    highScore = auxNumbers[j];
+                    highScoreIndex = j;
+
+                }
+            }
+            scores[i] = highScore;
+            names[i] = auxNames[highScoreIndex];
+            auxNumbers[highScoreIndex] = 0;
+
+            highScoreIndex = 0;
+            highScore = 0;
+            
+        }
+
+        
     }
 }
