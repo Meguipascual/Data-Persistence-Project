@@ -9,7 +9,8 @@ using System.IO;
 public class ScanePersistantData : MonoBehaviour
 {
     public static ScanePersistantData Instance;
-    public TextMeshProUGUI actualName;
+    public TextMeshProUGUI nameInputText;
+    public string actualName;
     public int actualScore;
     public string[] names = new string[10];
     public int[] scores = new int[10];
@@ -28,44 +29,34 @@ public class ScanePersistantData : MonoBehaviour
     [System.Serializable]
     class SaveData
     {
+        public string actualName;
         public int actualScore;
         public string[] names = new string[10];
         public int[] scores = new int[10];
+    }
+
+    public void SaveName()
+    {
+        actualName = nameInputText.text;
     }
     
     public void SaveAll()
     {
         SaveData data = new SaveData();
         data.actualScore = actualScore;
+        data.actualName = actualName;
         var index = 0;
         var nameSaved = false;
         var finished = false;
 
-        
-
-        while (!finished && index < 10)
+        for (int i = 0; i < scores.Length; i++)
         {
-            if(scores[index] > 0)
-            {
-                data.scores[index] = scores[index];
-                data.names[index] = names[index];
-                index++;
-            }
-            else
-            {
-                finished = true;
-            }
+            data.scores[i] = scores[i];
+            data.names[i] = names[i];
         }
+        
+        SortArrays(actualScore, nameInputText.text);
 
-        if (!nameSaved && index < 10) 
-        { 
-            data.names[index] = actualName.text;
-            data.scores[index] = actualScore;
-            nameSaved = true; 
-        }
-
-        SortArrays(actualScore, actualName.text);
-        //data.scores in a for = scores and the same with names
         for (int i = 0; i < scores.Length; i++)
         {
             data.scores[i]= scores[i];
@@ -83,15 +74,11 @@ public class ScanePersistantData : MonoBehaviour
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-            Debug.Log(data.names.Length);
-
             for (int i = 0; i < data.names.Length; i++)
             {
                 names[i] = data.names[i];
                 scores[i] = data.scores[i];
-                Debug.Log(i + 1 + ". " + names[i] + ":  " + scores[i]);
             }
-                        
         }
     }
     void SortArrays(int score, string name)
@@ -100,13 +87,13 @@ public class ScanePersistantData : MonoBehaviour
         var auxNames = new string[names.Length+1];
         var highScore = 0;
         var highScoreIndex = 0;
-        
-
+ 
         for (int i = 0; i < scores.Length; i++)
         {
             auxNumbers[i] = scores[i];
             auxNames[i] = names[i];
         }
+
         auxNumbers[auxNumbers.Length-1] = score;
         auxNames[auxNames.Length - 1] = name;
 
@@ -118,18 +105,13 @@ public class ScanePersistantData : MonoBehaviour
                 {
                     highScore = auxNumbers[j];
                     highScoreIndex = j;
-
                 }
             }
             scores[i] = highScore;
             names[i] = auxNames[highScoreIndex];
             auxNumbers[highScoreIndex] = 0;
-
             highScoreIndex = 0;
             highScore = 0;
-            
         }
-
-        
     }
 }

@@ -9,17 +9,13 @@ public class MainManager : MonoBehaviour
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
-
     public Text ScoreText;
     public Text bestScoreText;
     public GameObject GameOverText;
-    
     private bool m_Started = false;
     private int m_Points;
-    
     private bool m_GameOver = false;
 
-    
     // Start is called before the first frame update
     void Start()
     {
