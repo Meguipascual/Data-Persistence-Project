@@ -11,22 +11,35 @@ public class MenuManager : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI lastBestScore;
     [SerializeField] TextMeshProUGUI ranking;
+    public TextMeshProUGUI nameInputText;
     private string rankingString;
     // Start is called before the first frame update
     void Start()
     {
         ScanePersistantData.Instance.LoadAll();
+        LoadRanking();
+    }
+    private void LoadRanking()
+    {
+        ranking.text = "";
+        rankingString = "";
+        lastBestScore.text = "High Score: " + ScanePersistantData.Instance.scores[0] + ", " + ScanePersistantData.Instance.names[0];
+
         for (int i = 0; i < ScanePersistantData.Instance.scores.Length; i++)
         {
-            rankingString = rankingString + ""+ (i+1) + ". "+ ScanePersistantData.Instance.names[i] + ": " + ScanePersistantData.Instance.scores[i] + "\n";
+            if (ScanePersistantData.Instance.scores[i] != 0)
+            {
+                rankingString = rankingString + "" + (i + 1) + ". " + ScanePersistantData.Instance.names[i] + ": " + ScanePersistantData.Instance.scores[i] + "\n";
+            }
         }
         ranking.text = rankingString;
-        lastBestScore.text = "High Score: " + ScanePersistantData.Instance.scores[0]+ ", " +ScanePersistantData.Instance.names[0];
+        
     }
 
     public void StartButtonClicked()
     {
-        ScanePersistantData.Instance.SaveName();
+
+        ScanePersistantData.Instance.SaveName(nameInputText.text);
         SceneManager.LoadScene(1);
     }
 
@@ -37,5 +50,12 @@ public class MenuManager : MonoBehaviour
         #else
             Application.Quit(); // original code to quit Unity player
         #endif
+    }
+    public void DeleteRankingRecords()
+    {
+        ScanePersistantData.Instance.DeleteRankingRecords();
+        ScanePersistantData.Instance.LoadAll();
+        LoadRanking();
+
     }
 }

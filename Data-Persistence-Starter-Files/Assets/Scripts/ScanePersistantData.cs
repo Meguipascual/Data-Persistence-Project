@@ -5,11 +5,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.IO;
+using System;
 
 public class ScanePersistantData : MonoBehaviour
 {
     public static ScanePersistantData Instance;
-    public TextMeshProUGUI nameInputText;
     public string actualName;
     public int actualScore;
     public string[] names = new string[10];
@@ -35,11 +35,17 @@ public class ScanePersistantData : MonoBehaviour
         public int[] scores = new int[10];
     }
 
-    public void SaveName()
+    public void SaveName(string name)
     {
-        actualName = nameInputText.text;
+        actualName = name;
     }
-    
+    public void DeleteRankingRecords()
+    {
+        string json = "";
+        File.WriteAllText(Application.persistentDataPath + "/savefileBrick.json", json);
+    }
+
+
     public void SaveAll()
     {
         SaveData data = new SaveData();
@@ -55,12 +61,15 @@ public class ScanePersistantData : MonoBehaviour
             data.names[i] = names[i];
         }
         
-        SortArrays(actualScore, nameInputText.text);
+        SortArrays(data.actualScore, data.actualName);
 
         for (int i = 0; i < scores.Length; i++)
         {
-            data.scores[i]= scores[i];
-            data.names[i] = names[i];
+            if (scores[i] > 0)
+            {
+                data.scores[i] = scores[i];
+                data.names[i] = names[i];
+            }
         }
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(Application.persistentDataPath + "/savefileBrick.json", json);
@@ -72,12 +81,19 @@ public class ScanePersistantData : MonoBehaviour
         if (File.Exists(path))
         {
             string json = File.ReadAllText(path);
-            SaveData data = JsonUtility.FromJson<SaveData>(json);
-
-            for (int i = 0; i < data.names.Length; i++)
+            if (!String.IsNullOrWhiteSpace(json))
             {
-                names[i] = data.names[i];
-                scores[i] = data.scores[i];
+                SaveData data = JsonUtility.FromJson<SaveData>(json);
+                for (int i = 0; i < data.names.Length; i++)
+                {
+                    names[i] = data.names[i];
+                    scores[i] = data.scores[i];
+                }
+            }
+            else 
+            { 
+                names = new string[10]; scores = new int[10];
+                names[0] = "No record";
             }
         }
     }
